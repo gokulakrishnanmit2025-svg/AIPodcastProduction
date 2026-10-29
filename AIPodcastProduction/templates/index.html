@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AI Podcast Episode Production</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 30px 15px;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #10172a, #283c63);
+            color: white;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            font-size: 34px;
+            margin-bottom: 12px;
+        }
+
+        header p {
+            color: #d1d9e8;
+            line-height: 1.7;
+        }
+
+        .card {
+            background: white;
+            color: #222;
+            padding: 28px;
+            border-radius: 16px;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 13px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 16px;
+            background: white;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            background: #635bff;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #4942d8;
+        }
+
+        .download-button {
+            background: #16834a;
+            margin-top: 15px;
+        }
+
+        .download-button:hover {
+            background: #106738;
+        }
+
+        .error {
+            padding: 14px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            background: #ffe4e4;
+            color: #a00000;
+            line-height: 1.5;
+        }
+
+        .script {
+            padding: 18px;
+            border-radius: 8px;
+            background: #f3f5f9;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+            line-height: 1.8;
+            color: #222;
+        }
+
+        .note {
+            margin-top: 15px;
+            color: #555;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        footer {
+            padding: 15px;
+            text-align: center;
+            color: #d1d9e8;
+            font-size: 13px;
+        }
+
+        @media (max-width: 600px) {
+            header h1 {
+                font-size: 27px;
+            }
+
+            .card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="container">
+
+        <header>
+            <h1>🎙️ AI Podcast Episode Production</h1>
+
+            <p>
+                Turn your ideas into AI-generated podcast scripts
+                and downloadable audio episodes.
+            </p>
+        </header>
+
+        <section class="card">
+            <h2>✨ Create Your Podcast</h2>
+
+            {% if error %}
+                <div class="error" role="alert">
+                    {{ error }}
+                </div>
+            {% endif %}
+
+            <form method="POST" action="/">
+
+                <label for="topic">Podcast Topic</label>
+
+                <input
+                    type="text"
+                    id="topic"
+                    name="topic"
+                    placeholder="Example: Artificial Intelligence in Education"
+                    value="{{ topic }}"
+                    maxlength="200"
+                    required
+                >
+
+                <label for="duration">Target Duration</label>
+
+                <select id="duration" name="duration">
+                    <option value="1"
+                        {% if duration == 1 %}selected{% endif %}>
+                        1 minute
+                    </option>
+
+                    <option value="3"
+                        {% if duration == 3 %}selected{% endif %}>
+                        3 minutes
+                    </option>
+
+                    <option value="5"
+                        {% if duration == 5 %}selected{% endif %}>
+                        5 minutes
+                    </option>
+
+                    <option value="10"
+                        {% if duration == 10 %}selected{% endif %}>
+                        10 minutes
+                    </option>
+                </select>
+
+                <button type="submit">
+                    🎧 Generate Podcast Script
+                </button>
+
+            </form>
+        </section>
+
+        {% if script %}
+
+            <section class="card">
+                <h2>📝 Your Generated Podcast Script</h2>
+
+<div class="script" id="podcastScript">{{ script }}</div>
+<p>
+    📝 Total Words: <strong id="wordCount">0</strong>
+</p>
+
+<script>
+function updateWordCount() {
+    const script = document.getElementById("podcastScript");
+
+    if (!script) {
+        return;
+    }
+
+    const text = script.innerText.trim();
+
+    const count = text
+        ? text.split(/\s+/).length
+        : 0;
+
+    document.getElementById("wordCount").textContent = count;
+}
+
+document.addEventListener("DOMContentLoaded", updateWordCount);
+</script>
+
+<button type="button" onclick="copyPodcastScript()">
+    📋 Copy Podcast Script
+</button>
+
+<script>
+function copyPodcastScript() {
+    const script = document.getElementById("podcastScript").innerText;
+
+    navigator.clipboard.writeText(script)
+        .then(() => {
+            alert("Podcast script copied successfully!");
+        })
+        .catch(() => {
+            alert("Copy failed. Please select and copy the script manually.");
+        });
+}
+</script>
+<form method="POST" action="/download-script">
+    <input
+        type="hidden"
+        name="script"
+        value="{{ script }}"
+    >
+
+    <button type="submit">
+        📄 Download Podcast Script (TXT)
+    </button>
+</form>
+                <h3>🔊 Generate Podcast Audio</h3>
+
+                <form method="POST" action="/download-audio">
+
+                    <input
+                        type="hidden"
+                        name="script"
+                        value="{{ script }}"
+                    >
+
+                    <label for="language">Select Audio Language</label>
+
+                    <select id="language" name="language" required>
+                        <option value="en">English</option>
+                        <option value="ta">Tamil (தமிழ்)</option>
+                        <option value="hi">Hindi (हिन्दी)</option>
+                    </select>
+
+                    <button class="download-button" type="submit">
+                        ⬇️ Download Podcast Audio (MP3)
+                    </button>
+
+                </form>
+
+                <p class="note">
+                    Audio is generated using Google Text-to-Speech.
+                    An internet connection is required.
+                    Select a language to generate your audio file.
+                </p>
+            </section>
+
+        {% endif %}
+
+        <footer>
+            AI Podcast Episode Production |
+            Powered by Python, Flask, Ollama, and gTTS
+        </footer>
+
+    </main>
+</body>
+</html>
